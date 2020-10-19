@@ -9,7 +9,7 @@ import './index.styl'
 const ProfessorGames = observer(({ userId, user }) => {
   const [games] = useQuery('games', {
     $aggregate: [
-      { $match: { professorId: userId } },
+      { $match: { professorId: userId, status: { $ne: 'finished' } } },
       ...professorNamePipeline
     ]
   })

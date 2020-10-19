@@ -11,6 +11,7 @@ const PlayerGames = observer(({ userId, user }) => {
     $aggregate: [
       {
         $match: {
+          status: { $ne: 'finished' },
           $or: [
             { players: userId },
             { $expr: { $lt: [{ $size: '$players' }, 2] } }

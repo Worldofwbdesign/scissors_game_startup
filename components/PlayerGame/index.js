@@ -145,7 +145,13 @@ const PlayerGame = observer(({ userId, game, rounds }) => {
 
   if (!currentRound) {
     return pug`
-      H3.h3 Game is not started!
+      H3.title Game is not started!
+    `
+  }
+
+  if (game.status === 'finished') {
+    return pug`
+      H3.title Game is finished!
     `
   }
 

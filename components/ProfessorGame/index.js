@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { model, observer } from 'startupjs'
 import { Row, Div, H3, Button } from '@startupjs/ui'
 import PlayerCard from './PlayerCard'
+import { getPlayerStatus } from '../helpers'
 
 import './index.styl'
 
@@ -14,8 +15,29 @@ const ProfessorGame = observer(({ userId, game, rounds, playersHash }) => {
     await model.add('rounds', { gameId: game.id, round: currentRound.round + 1, stats: {} })
   }
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
+    const [firstPlayerId, secondPlayerId] = Object.keys(currentRound.stats)
+    const [firstPlayerStats, secondPlayerStats] = Object.values(currentRound.stats)
 
+    await model.setEach(`games.${game.id}`, {
+      status: 'finished',
+      stats: {
+        [firstPlayerId]: {
+          status: getPlayerStatus(firstPlayerStats.totalScore, secondPlayerStats.totalScore),
+          finalScore: firstPlayerStats.totalScore
+        },
+        [secondPlayerId]: {
+          status: getPlayerStatus(secondPlayerStats.totalScore, firstPlayerStats.totalScore),
+          finalScore: secondPlayerStats.totalScore
+        }
+      }
+    })
+  }
+
+  if (game.status === 'finished') {
+    return pug`
+      H3.title Game is finished!
+    `
   }
 
   return pug`
@@ -31,6 +53,7 @@ const ProfessorGame = observer(({ userId, game, rounds, playersHash }) => {
 
       Div.actions
         Button.btn(
+          disabled=currentRound.status !== 'finished'
           color="warning"
           onPress=handleFinish
         ) Finish game
