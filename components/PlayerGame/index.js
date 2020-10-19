@@ -1,6 +1,6 @@
 import React from 'react'
 import _ from 'lodash'
-import { model, observer } from 'startupjs'
+import { model, observer, batch } from 'startupjs'
 import { Div, Row, H3, H4, H5, Button } from '@startupjs/ui'
 import { faHandRock, faHandScissors, faHandPaper } from '@fortawesome/free-solid-svg-icons'
 
@@ -42,39 +42,18 @@ const getRoundWinner = (userAction, competitorAction) => {
 
 const PlayerGame = observer(({ userId, game, rounds }) => {
   const currentRound = rounds[rounds.length - 1]
-  const previousRound = rounds[rounds.length - 2]
   const stats = currentRound.stats
-  const competitorId = Object.keys(stats).find(key => key !== userId)
+
+  const previousRound = rounds[rounds.length - 2]
+  const competitorId = game.players.find(key => key !== userId)
+  const userPreviousRoundStats = _.get(previousRound, ['stats', userId], { totalScore: 0 })
+  const competitorPreviousRoundStats = _.get(previousRound, ['stats', competitorId], { totalScore: 0 })
+
   const actionDone = currentRound && currentRound.stats[userId]
 
-  const setFirstRoundStats = async (action, competitorAction) => {
+  const setRoundStats = async action => {
+    const competitorAction = stats[competitorId].action
     const [draw, userWinner, competitorWinner] = getRoundWinner(action, competitorAction)
-
-    await model.setEach(`rounds.${currentRound.id}`, {
-      status: 'finished',
-      stats: {
-        [userId]: {
-          action,
-          status: draw ? 'draw' : userWinner ? 'win' : 'lost',
-          score: userWinner ? 1 : 0,
-          totalScore: userWinner ? 1 : 0,
-          combo: userWinner
-        },
-        [competitorId]: {
-          action: competitorAction,
-          status: draw ? 'draw' : competitorWinner ? 'win' : 'lost',
-          score: competitorWinner ? 1 : 0,
-          totalScore: competitorWinner ? 1 : 0,
-          combo: competitorWinner
-        }
-      }
-    })
-  }
-
-  const setRoundStats = async (action, competitorAction) => {
-    const [draw, userWinner, competitorWinner] = getRoundWinner(action, competitorAction)
-    const userPreviousRoundStats = _.get(previousRound, ['stats', userId])
-    const competitorPreviousRoundStats = _.get(previousRound, ['stats', competitorId])
 
     const getUserScore = () => {
       if (userWinner) {
@@ -123,8 +102,6 @@ const PlayerGame = observer(({ userId, game, rounds }) => {
       }
     }
 
-    console.info('updateObj', updateObj)
-
     await model.setEach(`rounds.${currentRound.id}`, updateObj)
   }
 
@@ -132,14 +109,32 @@ const PlayerGame = observer(({ userId, game, rounds }) => {
     if (_.isEmpty(stats)) {
       await model.set(`rounds.${currentRound.id}.stats.${userId}.action`, action)
     } else {
-      const competitorAction = stats[competitorId].action
-
-      if (!previousRound) {
-        await setFirstRoundStats(action, competitorAction)
-      } else {
-        await setRoundStats(action, competitorAction)
-      }
+      await setRoundStats(action)
     }
+  }
+
+  const handleSurrender = async () => {
+    const promises = []
+    batch(() => {
+      promises.push(
+        model.set(`rounds.${currentRound.id}.stats.${userId}.action`, 'surrender'),
+        model.setEach(`games.${game.id}`, {
+          status: 'finished',
+          stats: {
+            [userId]: {
+              status: 'surrender',
+              finalScore: userPreviousRoundStats.totalScore
+            },
+            [competitorId]: {
+              status: 'win',
+              finalScore: competitorPreviousRoundStats.totalScore
+            }
+          }
+        })
+      )
+    })
+
+    await Promise.all(promises)
   }
 
   if (!currentRound) {
@@ -173,6 +168,11 @@ const PlayerGame = observer(({ userId, game, rounds }) => {
               color="success"
               onPress=() => handleAction(action.action)
             )
+
+        Button.btn(
+          color="danger"
+          onPress=handleSurrender
+        ) Surrender
   `
 })
 

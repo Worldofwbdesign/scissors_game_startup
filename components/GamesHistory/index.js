@@ -4,16 +4,14 @@ import { Div } from '@startupjs/ui'
 import GameHistoryListItem from '../GameHistoryListItem'
 import { professorNamePipeline, gamePlayersPipeline } from '../helpers'
 
-const ProfessorGamesHistory = observer(({ user }) => {
+const GamesHistory = observer(({ user }) => {
   const [games] = useQuery('games', {
     $aggregate: [
-      { $match: { professorId: user.id, status: 'finished' } },
+      { $match: { [user.isProfessor ? 'professorId' : 'players']: user.id, status: 'finished' } },
       ...professorNamePipeline,
       ...gamePlayersPipeline
     ]
   })
-
-  console.info('games', games)
 
   return pug`
     Div.root
@@ -27,4 +25,4 @@ const ProfessorGamesHistory = observer(({ user }) => {
   `
 })
 
-export default ProfessorGamesHistory
+export default GamesHistory
