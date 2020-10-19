@@ -3,10 +3,9 @@ import _ from 'lodash'
 import { observer, useQuery, useValue } from 'startupjs'
 import { Div, Pagination } from '@startupjs/ui'
 import RoundItem from './RoundItem'
+import { PAGE_SIZE } from '../constants'
 
 import './index.styl'
-
-const PAGE_SIZE = 10
 
 const GameChronology = observer(({ gameId, playersHash }) => {
   const [page, $page] = useValue(0)

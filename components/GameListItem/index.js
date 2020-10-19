@@ -1,18 +1,16 @@
 import React from 'react'
-import { Row, Col, Div, Span, Card, Button } from '@startupjs/ui'
-import { observer, emit, model, useSession } from 'startupjs'
+import { Div, Span, Card, Button } from '@startupjs/ui'
+import { observer, emit, model } from 'startupjs'
 import { formatDate } from '../helpers'
 
 import './index.styl'
 
 const GameListItem = observer(({ user = {}, first, $game, game: { _id, name, professorName, players = [], _m: { ctime } } }) => {
-  const [userId] = useSession('userId')
-
   const handleJoin = async () => {
-    if (players.length < 2 && !players.includes(userId) && !user.isProfessor) {
+    if (players.length < 2 && !players.includes(user.id) && !user.isProfessor) {
       const $game = model.scope(`games.${_id}`)
       await model.fetch($game)
-      await $game.push('players', userId)
+      await $game.push('players', user.id)
       model.unfetch($game)
     }
     emit('url', `/game/${_id}`)

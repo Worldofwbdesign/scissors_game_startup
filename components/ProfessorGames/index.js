@@ -1,24 +1,31 @@
 import React from 'react'
-import { observer, useQuery, emit } from 'startupjs'
-import { Div, Button, H2 } from '@startupjs/ui'
+import _ from 'lodash'
+import { observer, useQuery, useValue } from 'startupjs'
+import { Div, Pagination } from '@startupjs/ui'
 import { professorNamePipeline } from '../helpers'
 import GameListItem from '../GameListItem'
+import { PAGE_SIZE } from '../constants'
 
 import './index.styl'
 
 const ProfessorGames = observer(({ userId, user }) => {
-  const [games] = useQuery('games', {
-    $aggregate: [
-      { $match: { professorId: userId, status: { $ne: 'finished' } } },
-      ...professorNamePipeline
-    ]
-  })
-
-  const handleAdd = () => emit('url', '/createGame')
+  const [page, $page] = useValue(0)
+  const [[{ games = [], totalCount } = {}] = []] = useQuery('games',
+    {
+      $aggregate: [
+        { $match: { professorId: userId, status: { $ne: 'finished' } } },
+        {
+          $facet: {
+            games: [{ $skip: page * PAGE_SIZE }, { $limit: PAGE_SIZE }, ...professorNamePipeline],
+            totalCount: [{ $count: 'count' }]
+          }
+        }
+      ]
+    }
+  )
 
   return pug`
     Div.root
-      H2.h2 Games
       Div.games
         for game, index in games
           GameListItem(
@@ -27,12 +34,14 @@ const ProfessorGames = observer(({ userId, user }) => {
             game=game
             user=user
           )
-      
-      Div.actions
-        Button.addBtn(
-          color="success"
-          onPress=handleAdd
-        ) Add Game
+
+      Div.pagination
+        Pagination(
+          variant="compact"
+          page=page
+          pages=Math.ceil(_.get(totalCount, '0.count', 0) / PAGE_SIZE)
+          onChangePage=newPage => $page.set(newPage)
+        )
   `
 })
 

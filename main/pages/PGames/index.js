@@ -1,9 +1,11 @@
 import React from 'react'
-import { observer, useSession, useDoc } from 'startupjs'
+import { observer, useSession, useDoc, emit } from 'startupjs'
 import { ScrollView } from 'react-native'
-import { Content } from '@startupjs/ui'
+import { Div, Content, Button, H2 } from '@startupjs/ui'
 import ProfessorGames from 'components/ProfessorGames'
 import PlayerGames from 'components/PlayerGames'
+
+import './index.styl'
 
 const PGames = observer(() => {
   const [userId] = useSession('userId')
@@ -11,9 +13,25 @@ const PGames = observer(() => {
 
   if (!user) return
 
+  const handleAdd = () => emit('url', '/createGame')
+
   return pug`
     ScrollView.root
-      Content
+      Content.content
+        Div.header
+          H2.h2 Games
+          
+          Div.actions
+            if user.isProfessor
+              Button.btn(
+                color="success"
+                onPress=handleAdd
+              ) Add Game
+
+            Button.btn(
+              onPress=() => emit('url', '/gamesHistory')
+            ) Past games
+
         if user.isProfessor
           ProfessorGames(
             userId=userId

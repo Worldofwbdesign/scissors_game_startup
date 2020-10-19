@@ -17,11 +17,16 @@ export default (components = {}) => [
   {
     path: '/games',
     exact: true,
-    component: components.PGames,
+    component: components.PGames
   },
   {
     path: '/game/:gameId',
     exact: true,
     component: components.PGame
+  },
+  {
+    path: '/gamesHistory',
+    exact: true,
+    component: components.PGamesHistory
   }
-];
+]

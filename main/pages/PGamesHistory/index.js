@@ -2,8 +2,10 @@ import React from 'react'
 import { observer, useSession, useDoc } from 'startupjs'
 import { ScrollView } from 'react-native'
 import { Content, H2 } from '@startupjs/ui'
-import ProfessorGames from 'components/ProfessorGames'
+import ProfessorGamesHistory from 'components/ProfessorGamesHistory'
 import PlayerGames from 'components/PlayerGames'
+
+import './index.styl'
 
 const PGamesHistory = observer(() => {
   const [userId] = useSession('userId')
@@ -17,16 +19,14 @@ const PGamesHistory = observer(() => {
 
   return pug`
     ScrollView.root
-      Content
-        H2 Past games
+      Content.content
+        H2.h2 Past games
         if user.isProfessor
-          ProfessorGames(
-            userId=userId
+          ProfessorGamesHistory(
             user=user
           )
         else
           PlayerGames(
-            userId=userId
             user=user
           )
   `

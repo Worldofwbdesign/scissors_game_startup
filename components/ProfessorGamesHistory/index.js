@@ -2,15 +2,18 @@ import React from 'react'
 import { observer, useQuery } from 'startupjs'
 import { Div } from '@startupjs/ui'
 import GameHistoryListItem from '../GameHistoryListItem'
-import { professorNamePipeline } from '../helpers'
+import { professorNamePipeline, gamePlayersPipeline } from '../helpers'
 
-const ProfessorGamesHistory = observer(({ userId }) => {
+const ProfessorGamesHistory = observer(({ user }) => {
   const [games] = useQuery('games', {
     $aggregate: [
-      { $match: { professorId: userId, status: 'finished' } },
-      ...professorNamePipeline
+      { $match: { professorId: user.id, status: 'finished' } },
+      ...professorNamePipeline,
+      ...gamePlayersPipeline
     ]
   })
+
+  console.info('games', games)
 
   return pug`
     Div.root

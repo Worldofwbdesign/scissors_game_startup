@@ -46,7 +46,6 @@ const PlayerGame = observer(({ userId, game, rounds }) => {
   const stats = currentRound.stats
   const competitorId = Object.keys(stats).find(key => key !== userId)
   const actionDone = currentRound && currentRound.stats[userId]
-  console.info('previousRound', previousRound)
 
   const setFirstRoundStats = async (action, competitorAction) => {
     const [draw, userWinner, competitorWinner] = getRoundWinner(action, competitorAction)

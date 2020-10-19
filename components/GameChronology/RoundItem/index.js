@@ -1,10 +1,13 @@
 import React from 'react'
+import _ from 'lodash'
 import { Div, Span } from '@startupjs/ui'
 import PlayerRoundStats from '../PlayerRoundStats'
 
 import './index.styl'
 
 const RoundItem = ({ round: { round, stats }, playersHash }) => {
+  console.info('playersHash', playersHash)
+
   return pug`
     Div.root
       Span.item
@@ -15,7 +18,7 @@ const RoundItem = ({ round: { round, stats }, playersHash }) => {
           key=playerId
         )
           PlayerRoundStats(
-            playerName=playersHash[playerId].name
+            playerName=_.get(playersHash, [playerId, 'name'])
             stats=stats[playerId]
           )
 

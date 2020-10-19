@@ -16,6 +16,17 @@ export const professorNamePipeline = [
   }
 ]
 
+export const gamePlayersPipeline = [
+  {
+    $lookup: {
+      from: 'users',
+      localField: 'players',
+      foreignField: '_id',
+      as: 'players'
+    }
+  }
+]
+
 export const getPlayerStatus = (playerScore, competitiorScore) => {
   if (playerScore === competitiorScore) return 'draw'
 

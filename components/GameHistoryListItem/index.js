@@ -1,50 +1,51 @@
-import React from 'react'
+import React, { useMemo } from 'react'
+import { observer, useValue } from 'startupjs'
+import _ from 'lodash'
 import { Div, Span, Card, Button } from '@startupjs/ui'
-import { observer, emit, model, useSession } from 'startupjs'
-import { formatDate } from '../helpers'
+import { faAngleUp, faAngleDown } from '@fortawesome/free-solid-svg-icons'
+import GameChronology from '../GameChronology'
 
 import './index.styl'
 
-const GameHistoryListItem = observer(({ user = {}, first, game: { _id, name, professorName, players = [], _m: { ctime } } }) => {
-  const [userId] = useSession('userId')
+const GameHistoryListItem = observer(({ user = {}, first, game: { _id, name, professorName, stats, players = [] } }) => {
+  const [expand, $expand] = useValue(false)
+  const playersHash = useMemo(() => _.keyBy(players, '_id'), [players])
 
-  const handleJoin = async () => {
-    if (players.length < 2 && !players.includes(userId) && !user.isProfessor) {
-      const $game = model.scope(`games.${_id}`)
-      await model.fetch($game)
-      await $game.push('players', userId)
-      model.unfetch($game)
-    }
-    emit('url', `/game/${_id}`)
-  }
+  const getPlayerName = playerId => players.find(player => player._id === playerId).name
 
   return pug`
     Card.root(
       styleName=[first && 'first']
     )
-      Div.stats
-        Div.item
-          Span.item__key Game: 
-          Span.item__label= name
+      Div.content
+        Div.stats
+          Div.item
+            Span.item__key Game: 
+            Span.item__label= name
 
-        Div.item
-          Span.item__key Pofessor: 
-          Span.item__label= professorName
+          Div.item
+            Span.item__key Pofessor: 
+            Span.item__label= professorName
 
-        Div.item
-          Span.item__key Created: 
-          Span.item__label= formatDate(ctime)
+          each playerId in Object.keys(stats)
+            Div.item(
+              key=playerId
+            )
+              Span.item__key #{getPlayerName(playerId)}: 
+              Span.item__label #{stats[playerId].finalScore} (#{stats[playerId].status})
 
-        Div.item
-          Span.item__key Players: 
-          Span.item__label= players.length
+        Div.actions
+          Button(
+            onPress=() => $expand.set(!expand)
+            color="success"
+            icon=expand ? faAngleUp : faAngleDown
+          ) Chronology
 
-      Div.actions
-        Button(
-          onPress=handleJoin
-          color="success"
-        ) Join
-
+      if expand
+        GameChronology(
+          gameId=_id
+          playersHash=playersHash
+        )
   `
 })
 
