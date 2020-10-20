@@ -1,9 +1,9 @@
-import React from 'react';
-import { ScrollView } from 'react-native';
-import { H1, Content } from '@startupjs/ui';
-import GameForm from 'components/GameForm';
+import React from 'react'
+import { ScrollView } from 'react-native'
+import { H1, Content } from '@startupjs/ui'
+import GameForm from 'components/GameForm'
 
-import './index.styl';
+import './index.styl'
 
 const PGameCreate = () => {
   return pug`
@@ -11,7 +11,7 @@ const PGameCreate = () => {
       Content.root
         H1.h1 Create game
         GameForm
-  `;
-};
+  `
+}
 
-export default PGameCreate;
+export default PGameCreate

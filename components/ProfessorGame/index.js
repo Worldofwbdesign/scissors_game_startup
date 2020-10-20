@@ -8,7 +8,7 @@ import { getPlayerStatus } from '../helpers'
 import './index.styl'
 
 const ProfessorGame = observer(({ userId, game, rounds, playersHash }) => {
-  const currentRound = rounds[rounds.length - 1]
+  const currentRound = rounds[0]
   const stats = currentRound.stats
 
   const handleNext = async () => {

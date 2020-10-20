@@ -1,18 +1,18 @@
-import React from 'react';
-import { observer, useValue, useSession, emit } from 'startupjs';
-import { Content, H2, Input, Checkbox, Button } from '@startupjs/ui';
+import React from 'react'
+import { model, observer, useValue, useSession, emit } from 'startupjs'
+import { Content, H2, Input, Checkbox, Button } from '@startupjs/ui'
 
-import './index.styl';
+import './index.styl'
 
 const LoginForm = observer(() => {
-  const [userId, $userId] = useSession('userId');
-  const [name, $name] = useValue();
-  const [checked, $checked] = useValue(false);
+  const [userId] = useSession('userId')
+  const [name, $name] = useValue()
+  const [checked, $checked] = useValue(false)
 
   const handleLogin = async () => {
-    model.add('users', { id: userId, name, isProfessor: checked });
-    emit('url', '/');
-  };
+    model.add('users', { id: userId, name, isProfessor: checked })
+    emit('url', '/')
+  }
 
   return pug`
     Content
@@ -31,7 +31,7 @@ const LoginForm = observer(() => {
         color='success'
         onPress=handleLogin
       ) Enter
-  `;
-});
+  `
+})
 
-export default LoginForm;
+export default LoginForm

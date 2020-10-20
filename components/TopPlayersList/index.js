@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer, useQuery } from 'startupjs'
-import { Div, Card, Span } from '@startupjs/ui'
+import { Div, Card, Span, H4 } from '@startupjs/ui'
 
 import './index.styl'
 
@@ -33,7 +33,11 @@ const TopPlayersList = observer(() => {
     ]
   })
 
-  console.info('players', players)
+  if (!players || !players.length) {
+    return pug`
+      H4.title No players found!
+    `
+  }
 
   return pug`
     Div.root

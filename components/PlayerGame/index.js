@@ -41,10 +41,10 @@ const getRoundWinner = (userAction, competitorAction) => {
 }
 
 const PlayerGame = observer(({ userId, game, rounds }) => {
-  const currentRound = rounds[rounds.length - 1]
+  const currentRound = rounds[0]
   const stats = currentRound.stats
 
-  const previousRound = rounds[rounds.length - 2]
+  const previousRound = rounds[1]
   const competitorId = game.players.find(key => key !== userId)
   const userPreviousRoundStats = _.get(previousRound, ['stats', userId], { totalScore: 0 })
   const competitorPreviousRoundStats = _.get(previousRound, ['stats', competitorId], { totalScore: 0 })
@@ -170,7 +170,7 @@ const PlayerGame = observer(({ userId, game, rounds }) => {
             )
 
         Button.btn(
-          color="danger"
+          color="error"
           onPress=handleSurrender
         ) Surrender
   `

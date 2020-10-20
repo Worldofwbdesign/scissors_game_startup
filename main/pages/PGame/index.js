@@ -2,7 +2,7 @@ import React from 'react'
 import _ from 'lodash'
 import { observer, useDoc, useSession, useQuery } from 'startupjs'
 import { ScrollView } from 'react-native'
-import { Content, Div, H2, H4, Pagination } from '@startupjs/ui'
+import { Content, Div, H2, H4 } from '@startupjs/ui'
 import PlayerGame from 'components/PlayerGame'
 import ProfessorGame from 'components/ProfessorGame'
 import GameChronology from 'components/GameChronology'
@@ -14,7 +14,7 @@ const PGame = observer(props => {
   const [userId] = useSession('userId')
   const [user] = useSession('user', userId)
   const [game, $game] = useDoc('games', gameId)
-  const [rounds] = useQuery('rounds', { gameId: game && game.id })
+  const [rounds] = useQuery('rounds', { gameId: game && game.id, $sort: { round: -1 }, $limit: 2 })
   const [players] = useQuery('users', { _id: { $in: _.get(game, 'players', []) } })
   const playersHash = _.keyBy(players, 'id')
 
