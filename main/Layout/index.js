@@ -38,7 +38,7 @@ export default observer(function ({ children }) {
         MenuItem(url='/') Home
         MenuItem(url='/games') Games
         MenuItem(url='/gamesHistory') Past Games
-        if user.isProfessor
+        if user && user.isProfessor
           MenuItem(url='/createGame') Create game
     `
   }
