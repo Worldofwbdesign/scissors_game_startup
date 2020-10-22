@@ -1,13 +1,15 @@
-import React from 'react'
-import { observer, emit, useValue, useLocal } from 'startupjs'
+import React, { useEffect } from 'react'
+import {
+  observer,
+  emit,
+  usePage,
+  useLocal,
+  useSession,
+  useDoc
+} from 'startupjs'
 import './index.styl'
-import { Row, Div, Layout, SmartSidebar, Menu, Button, H1 } from '@startupjs/ui'
-import { faBars } from '@fortawesome/free-solid-svg-icons'
-import APP from '../../app.json'
-
-const { displayName } = APP
-
-const APP_NAME = displayName.charAt(0).toUpperCase() + displayName.slice(1)
+import { Div, Layout, SmartSidebar, Menu } from '@startupjs/ui'
+import Header from 'components/Header'
 
 const MenuItem = observer(({ url, children }) => {
   const [currentUrl] = useLocal('$render.url')
@@ -20,13 +22,24 @@ const MenuItem = observer(({ url, children }) => {
 })
 
 export default observer(function ({ children }) {
-  const [opened, $opened] = useValue(false)
+  const [, $opened] = usePage('sidebarOpened')
+  const [userId] = useSession('userId')
+  const [user] = useDoc('users', userId)
+
+  useEffect(() => {
+    if (!user) {
+      emit('url', '/login')
+    }
+  }, [])
 
   function renderSidebar () {
     return pug`
       Menu.sidebar
-        MenuItem(url='/') App
-        MenuItem(url='/about') About
+        MenuItem(url='/') Home
+        MenuItem(url='/games') Games
+        MenuItem(url='/gamesHistory') Past Games
+        if user && user.isProfessor
+          MenuItem(url='/createGame') Create game
     `
   }
 
@@ -37,9 +50,7 @@ export default observer(function ({ children }) {
         path=$opened.path()
         renderContent=renderSidebar
       )
-        Row.menu
-          Button(color='secondaryText' icon=faBars onPress=() => $opened.set(!opened))
-          H1.logo= APP_NAME
+        Header
 
         Div.body= children
   `

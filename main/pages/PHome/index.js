@@ -1,14 +1,22 @@
 import React from 'react'
-import { observer } from 'startupjs'
+import { observer, emit } from 'startupjs'
 import { ScrollView } from 'react-native'
-import { TestComponent } from 'components'
-import './index.styl'
-import { Content } from '@startupjs/ui'
+import { Content, H2, Button } from '@startupjs/ui'
+import TopPlayersList from 'components/TopPlayersList'
 
-export default observer(function PHome () {
+import './index.styl'
+
+const PHome = observer(() => {
   return pug`
     ScrollView.root
-      Content
-        TestComponent
+      Content.content
+        Button.btn(
+          color="success"
+          onPress=() => emit('url', '/games')
+        ) Play!
+        H2.h2 Top 10 Players
+        TopPlayersList
   `
 })
+
+export default PHome

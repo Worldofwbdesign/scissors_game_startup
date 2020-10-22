@@ -5,8 +5,28 @@ export default (components = {}) => [
     component: components.PHome
   },
   {
-    path: '/about',
+    path: '/login',
     exact: true,
-    component: components.PAbout
+    component: components.PLogin
+  },
+  {
+    path: '/createGame',
+    exact: true,
+    component: components.PGameCreate
+  },
+  {
+    path: '/games',
+    exact: true,
+    component: components.PGames
+  },
+  {
+    path: '/game/:gameId',
+    exact: true,
+    component: components.PGame
+  },
+  {
+    path: '/gamesHistory',
+    exact: true,
+    component: components.PGamesHistory
   }
 ]
